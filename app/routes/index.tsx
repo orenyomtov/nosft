@@ -3,9 +3,15 @@ import { useSubmit } from "@remix-run/react";
 import { useLoaderData } from "react-router";
 import HeroSection from "~/components/HeroSection";
 import NavBar from "~/components/NavBar";
-import { getAddressInfo } from "~/services.server";
+import { getAddressInfo, getUtxos, checkIfInscriptionExists, getPreviousTxOfUtxo } from "~/services.server";
 import { createUserSession, getNostrPublicKey } from "~/session.server";
 import { connectWallet } from "~/utils";
+import { INSCRIPTION_SEARCH_DEPTH } from "~/constants";
+
+export type Utxo = {
+  txid: string;
+  vout: string;
+};
 
 export async function loader({ request }: LoaderArgs) {
   const nostrPublicKey = await getNostrPublicKey(request)
@@ -14,8 +20,29 @@ export async function loader({ request }: LoaderArgs) {
   }
 
   const { address } = getAddressInfo(nostrPublicKey)
-
-  return json<{ address: string | undefined }>({ address })
+  if (!address) return
+  const utxos: Utxo[] = await getUtxos(address);
+  const inscriptions: Utxo[] = []
+  for (const utxo of utxos) {
+    try {
+      let status = await checkIfInscriptionExists(utxo);
+      if (status === 200) {
+        inscriptions.push(utxo)
+      } else {
+        let previousUtxo = utxo;
+        for (let count = 0; count < INSCRIPTION_SEARCH_DEPTH; count++) {
+          const prevTransactionUtxo = await getPreviousTxOfUtxo(previousUtxo.txid);
+          if (await checkIfInscriptionExists(prevTransactionUtxo)) {
+            count = INSCRIPTION_SEARCH_DEPTH;
+            inscriptions.push(utxo)
+          }
+        }
+      }
+    } catch (err) {
+      console.log(`Error from ordinals.com`)
+    }
+  }
+  return { address, inscriptions }
 }
 
 export async function action({ request }: ActionArgs) {
@@ -46,6 +73,9 @@ export default function Index() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <HeroSection handleConnectWallet={handleConnectWallet} />
       </div>
+      <ul>
+        {data?.inscriptions?.map((utxo: Utxo) => (<li key={utxo.txid}> {utxo.txid} </li>))}
+      </ul>
     </div>
   );
 }

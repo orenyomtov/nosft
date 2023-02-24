@@ -1,4 +1,4 @@
-interface ButtonProps {
+type ButtonProps = {
   primary?: boolean;
   size?: 'small' | 'large';
   label: string;
