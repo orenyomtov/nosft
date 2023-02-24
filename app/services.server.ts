@@ -1,0 +1,13 @@
+import * as bitcoin from "bitcoinjs-lib";
+import * as ecc from "tiny-secp256k1";
+import { TESTNET } from "./constants";
+bitcoin.initEccLib(ecc);
+
+export const getAddressInfo = (nostrPublicKey: string) => {
+  const pubkeyBuffer = Buffer.from(nostrPublicKey, "hex");
+  const addrInfo = bitcoin.payments.p2tr({
+    pubkey: pubkeyBuffer,
+    network: TESTNET ? bitcoin.networks.testnet : bitcoin.networks.bitcoin,
+  });
+  return addrInfo;
+};
