@@ -1,7 +1,7 @@
 import { cloudfrontUrl, ordinalsImageUrl } from "~/utils";
 import { Utxo } from "~/types";
 
-export default function Card({ ordinal }: { ordinal: Utxo }) {
+export default function InscriptionCard({ ordinal }: { ordinal: Utxo }) {
   const url = ordinal?.status?.confirmed ? ordinalsImageUrl(ordinal) : cloudfrontUrl(ordinal)
   const isImage = ordinal?.contentType?.startsWith('image')
   return (
@@ -19,7 +19,7 @@ export default function Card({ ordinal }: { ordinal: Utxo }) {
         }
       </div>
       <div className="flex flex-1 flex-col space-y-2 p-4">
-        <h3 className="text-sm font-medium text-gray-900">
+        <h3 className="text-sm font-medium text-gray-900 overflow-hidden">
           <span>
             {ordinal.txid}
           </span>

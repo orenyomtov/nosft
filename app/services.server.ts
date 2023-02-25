@@ -1,7 +1,7 @@
 import * as bitcoin from "bitcoinjs-lib";
 import * as ecc from "tiny-secp256k1";
-import { TESTNET } from "./constants";
-import { Utxo } from "./routes";
+import { INSCRIPTION_SEARCH_DEPTH, TESTNET } from "./constants";
+import { Utxo } from "./types";
 bitcoin.initEccLib(ecc);
 
 export const getAddressInfo = (nostrPublicKey: string) => {
@@ -21,18 +21,29 @@ export const getUtxos = async (address: string) => {
 
 export const checkIfInscriptionExists = async (utxo: Utxo) => {
   const inscriptionId = `${utxo.txid}i${utxo.vout}`
-  let res = await fetch(`https://ordinals.com/inscription/${inscriptionId}`)
+  let res = await fetch(`https://ordinals.com/inscription/${inscriptionId}`, { cache: "force-cache" })
   return res.status
 }
 
 export const getPreviousTxOfUtxo = async (txid: string) => {
-  let res = await fetch(`https://mempool.space/api/tx/${txid}`)
+  let res = await fetch(`https://mempool.space/api/tx/${txid}`, { cache: "force-cache" })
   res = await res.json()
   return res?.vin[0]
 }
 
-export const checkContentType = async (utxo: Utxo): Promise<string | null> => {
+export const checkContentType = async (utxo: Pick<Utxo, 'txid' | 'vout'>): Promise<string | null> => {
   const url = `https://ordinals.com/content/${utxo.txid}i${utxo.vout}`;
-  let res = await fetch(url, { method: 'HEAD' })
+  let res = await fetch(url, { method: 'HEAD', cache: "force-cache" })
   return res?.headers?.get('Content-Type')
+}
+
+export const getPreviousTrasactions = async (utxos: Utxo[]) => {
+  return Promise.all(utxos.map(async utxo => {
+    const prevTx = await getPreviousTxOfUtxo(utxo.txid)
+    return {
+      ...utxo,
+      txid: prevTx.txid,
+      vout: prevTx.vout,
+    }
+  }))
 }

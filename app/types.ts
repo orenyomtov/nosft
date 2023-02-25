@@ -2,7 +2,7 @@ export type Utxo = {
   txid: string;
   vout: string;
   status?: {
-    cofirmed: boolean
+    confirmed: boolean
   };
   value?: string,
   contentType: string | null

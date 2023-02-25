@@ -4,19 +4,6 @@ import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { classNames, connectWallet } from '~/utils'
 import { Button } from './elements/Button'
 
-const user = {
-  name: 'Tom Cook',
-  email: 'tom@example.com',
-  imageUrl:
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-}
-
-const userNavigation = [
-  { name: 'Your Profile', href: '#' },
-  { name: 'Settings', href: '#' },
-  { name: 'Sign out', href: '#' },
-]
-
 interface NavBarProps {
   address: string | undefined;
   handleConnectWallet?: () => void;
@@ -72,7 +59,7 @@ export default function Navbar({ handleConnectWallet, address }: NavBarProps) {
                     <div>
                       <Menu.Button className="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                         <span className="sr-only">Open user menu</span>
-                        <img className="h-8 w-8 rounded-full" src={user.imageUrl} alt="" />
+                        <img className="h-8 w-8 rounded-full border border-yellow-400" src="/nos-ft-logo.png" alt="" />
                       </Menu.Button>
                     </div>
                     <Transition
@@ -123,7 +110,7 @@ export default function Navbar({ handleConnectWallet, address }: NavBarProps) {
             <div className="border-t border-gray-700 pt-4 pb-3">
               <div className="flex items-center px-5 sm:px-6">
                 <div className="flex-shrink-0">
-                  <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt="" />
+                  <img className="h-10 w-10 rounded-full border border-yellow-400" src="/nos-ft-logo.png" alt="" />
                 </div>
                 <div className="ml-3">
                 </div>
