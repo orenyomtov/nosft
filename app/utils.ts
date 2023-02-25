@@ -1,9 +1,5 @@
 import { TESTNET, ASSUMED_TX_BYTES } from "./constants";
-
-type Utxo = {
-  txid: string;
-  vout: string;
-};
+import { Utxo } from "./types";
 
 export const classNames = (...classes: string[]) => {
   return classes.filter(Boolean).join(" ");
