@@ -14,6 +14,7 @@
         "@remix-run/netlify": "^1.13.0",
         "@remix-run/node": "^1.13.0",
         "@remix-run/react": "^1.13.0",
+        "bitcoin-address-validation": "2.2.1",
         "bitcoinjs-lib": "^6.1.0",
         "cross-env": "^7.0.3",
         "react": "^18.2.0",

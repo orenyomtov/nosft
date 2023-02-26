@@ -1,8 +1,10 @@
 import { ActionArgs, LoaderArgs, json } from "@remix-run/node";
 import { useSubmit } from "@remix-run/react";
+import { useEffect, useState } from "react";
 import { useLoaderData } from "react-router";
 import HeroSection from "~/components/HeroSection";
 import NavBar from "~/components/NavBar";
+import SendInscriptionModal from "~/components/modals/SendInscriptionModal";
 import { getAddressInfo, getUtxos, checkIfInscriptionExists, getPreviousTxOfUtxo, checkContentType, getPreviousTrasactions } from "~/services.server";
 import { createUserSession, getNostrPublicKey } from "~/session.server";
 import { connectWallet } from "~/utils";
@@ -28,9 +30,7 @@ export async function loader({ request }: LoaderArgs) {
 
   let formatInscriptionedUtxos = inscriptionedUtxos.filter(({ status }) => status === 200).map(x => x.utxo)
   let restOfTheFirstInscriptions = inscriptionedUtxos.filter(({ status }) => status !== 200).map(x => x.utxo)
-  let utxosWithRightTransactions = await getPreviousTrasactions(restOfTheFirstInscriptions).then(prevTransactions => {
-    return prevTransactions
-  })
+  let utxosWithRightTransactions = await getPreviousTrasactions(restOfTheFirstInscriptions)
 
   return json({ address, inscriptions: [...formatInscriptionedUtxos, ...utxosWithRightTransactions] })
 }
@@ -48,6 +48,7 @@ export async function action({ request }: ActionArgs) {
 }
 
 export default function Index() {
+  const [inscription, setInscription] = useState(null);
   const { address, inscriptions } = useLoaderData() as { address: string, inscriptions: Utxo[] };
   const submit = useSubmit()
   const handleConnectWallet = async () => {
@@ -57,13 +58,22 @@ export default function Index() {
     submit(formData, { method: "post" })
   }
 
+  useEffect(() => {
+    console.log(inscription)
+  }, [inscription])
+
+  const handleSendInscription = () => {
+
+  }
+
   return (
     <div className="bg-gray-800">
       <NavBar address={address} handleConnectWallet={handleConnectWallet} />
       {!address && <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <HeroSection handleConnectWallet={handleConnectWallet} />
       </div>}
-      <InscriptionList inscriptions={inscriptions} />
+      <InscriptionList inscriptions={inscriptions} setInscription={setInscription} />
+      <SendInscriptionModal handleSendInscription={handleSendInscription} inscription={inscription} onClose={() => setInscription(null)} />
     </div>
   );
 }
