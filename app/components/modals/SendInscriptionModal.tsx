@@ -5,13 +5,13 @@ import { Utxo } from '~/types'
 import { Button } from '../elements/Button'
 import InscriptionCard from '../InscriptionCard'
 import { Input } from '../elements/Input'
-import { TESTNET } from '~/constants'
+import { DEFAULT_FEE_RATE, TESTNET } from '~/constants'
 
 export default function SendInscriptionModal({ inscription, onClose }: { inscription: Utxo | null, onClose: (value: boolean) => void }) {
   const [open, setOpen] = useState(true)
   const [bitcoinAddress, setBitcoinAddress] = useState("")
   const [error, setError] = useState({ bitcoinAddress: "" })
-  const [feeRate, setFeeRate] = useState(1)
+  const [feeRate, setFeeRate] = useState(DEFAULT_FEE_RATE)
 
   const handleBitcoinAddress = (address: string) => {
     setBitcoinAddress(address)
@@ -26,11 +26,18 @@ export default function SendInscriptionModal({ inscription, onClose }: { inscrip
     }
   }
 
+  const handleClose = (e: any) => {
+    setBitcoinAddress("")
+    setError({ bitcoinAddress: "" })
+    setFeeRate(DEFAULT_FEE_RATE)
+    onClose(e)
+  }
+
   const cancelButtonRef = useRef(null)
 
   return (
     <Transition.Root show={open && !!inscription} as={Fragment}>
-      <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={onClose}>
+      <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={handleClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
